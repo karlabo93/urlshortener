@@ -34,8 +34,8 @@ type CreateURLRequest struct {
 
 // Global variables
 var (
-	tableName = os.Getenv("url-shortener") // DynamoDB table name from environment variable
-	ddbClient *dynamodb.Client             //Dynamodb client instance
+	tableName = os.Getenv("DYNAMODB_TABLE") // DynamoDB table name from environment variable
+	ddbClient *dynamodb.Client              //Dynamodb client instance
 
 )
 
