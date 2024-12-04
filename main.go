@@ -82,7 +82,7 @@ func createShortURL(ctx context.Context, request events.APIGatewayProxyRequest) 
 	}
 
 	// Generate a new short URL()
-
+	shortURL := generateShortURL()
 	// Create a new URLMapping object
 	urlMapping := URLMapping{
 		ShortURL:    shortURL,
@@ -174,7 +174,7 @@ func getOriginalURL(ctx context.Context, request events.APIGatewayProxyRequest) 
 
 	// Increment the access count asynchronously
 	// Note: We don't wait for this to complete before redirecting
-	_, err = dbbClient.UpdateItem(ctx, &dynamodb.UpdateItemInput{
+	_, err = ddbClient.UpdateItem(ctx, &dynamodb.UpdateItemInput{
 		TableName:        &tableName,
 		Key:              key,
 		UpdateExpression: aws.String("SET access_count + :inc"),
@@ -182,6 +182,10 @@ func getOriginalURL(ctx context.Context, request events.APIGatewayProxyRequest) 
 			":inc": &types.AttributeValueMemberN{Value: "1"},
 		},
 	})
+
+	if err != nil {
+		log.Printf("Error updating access count :%v", err)
+	}
 
 	// Return a redirect response to the original URL
 	return events.APIGatewayProxyResponse{
