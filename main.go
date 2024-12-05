@@ -118,7 +118,10 @@ func createShortURL(ctx context.Context, request events.APIGatewayProxyRequest) 
 	return events.APIGatewayProxyResponse{
 		StatusCode: 201,
 		Headers: map[string]string{
-			"Content-Type": "application/json",
+			"Content-Type":                 "application/json",
+			"Access-Control-Allow-Origin":  "*",
+			"Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+			"Access-Control-Allow-Headers": "Content-Type",
 		},
 		Body: string(response),
 	}, nil
@@ -177,7 +180,7 @@ func getOriginalURL(ctx context.Context, request events.APIGatewayProxyRequest) 
 	_, err = ddbClient.UpdateItem(ctx, &dynamodb.UpdateItemInput{
 		TableName:        &tableName,
 		Key:              key,
-		UpdateExpression: aws.String("SET access_count + :inc"),
+		UpdateExpression: aws.String("SET access_count = access_count + :inc"),
 		ExpressionAttributeValues: map[string]types.AttributeValue{
 			":inc": &types.AttributeValueMemberN{Value: "1"},
 		},
@@ -191,7 +194,10 @@ func getOriginalURL(ctx context.Context, request events.APIGatewayProxyRequest) 
 	return events.APIGatewayProxyResponse{
 		StatusCode: 301, //HTTP 301 Moved Permanently
 		Headers: map[string]string{
-			"Location": urlMapping.LongURL, // This header causes the browser to redirect
+			"Location":                     urlMapping.LongURL,
+			"Access-Control-Allow-Origin":  "*",
+			"Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+			"Access-Control-Allow-Headers": "Content-Type", // This header causes the browser to redirect
 		},
 	}, nil
 
